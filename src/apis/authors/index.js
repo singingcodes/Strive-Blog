@@ -73,7 +73,7 @@ authorsRouter.post("/checkEmail", (req, res) => {
   const authors = JSON.parse(fs.readFileSync(authorsJSONPath))
   const author = authors.find((author) => author.email === email)
   if (author) {
-    res.status(200).json({
+    res.status(404).json({
       message: "Email already exists",
       success: false,
     })

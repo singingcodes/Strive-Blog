@@ -15,25 +15,24 @@ const postSchema = {
     in: ["body"],
     isString: { errorMessage: "Cover is required" },
   },
-  readTime: {
-    value: {
-      min: 2,
-      errorMessage: "Read time must be minimum of 2 minutes",
-    },
-    unit: {
-      in: ["body"],
-      isString: { errorMessage: "Unit is required" },
-    },
+
+  "readTime.value": {
+    in: ["body"],
+    isInt: { errorMessage: "Read time is required" },
   },
-  author: {
-    name: {
-      in: ["body"],
-      isString: { errorMessage: "Author's Name is required" },
-    },
-    avatar: {
-      in: ["body"],
-      isString: { errorMessage: "Avatar is required" },
-    },
+
+  "readTime.unit": {
+    in: ["body"],
+    isString: { errorMessage: "Unit is required" },
+  },
+
+  "author.name": {
+    in: ["body"],
+    isString: { errorMessage: "Author's Name is required" },
+  },
+  "author.avatar": {
+    in: ["body"],
+    isString: { errorMessage: "Author's Avatar is required" },
   },
 
   createdAt: {

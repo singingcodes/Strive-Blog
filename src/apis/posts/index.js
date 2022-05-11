@@ -37,6 +37,7 @@ postsRouter.post(
   checkPostValidationResult,
   (req, res, next) => {
     try {
+      console.log(req.body)
       const newPost = { ...req.body, id: uniqid(), createdAt: new Date() }
       const posts = getPosts()
       posts.push(newPost)

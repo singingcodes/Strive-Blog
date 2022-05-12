@@ -95,7 +95,7 @@ postsRouter.delete("/:postId", async (req, res, next) => {
 //POST /blogPosts/:id/uploadCover, uploads a picture (save as idOfTheBlogPost.jpg in the public/img/blogPosts folder) for the blog post specified by the id. Store the newly created URL into the corresponding post in blogPosts.json
 
 postsRouter.post(
-  "/posts/:postId/cover",
+  "/:postId/cover",
   multer({
     fileFilter: (req, file, multerNext) => {
       if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
@@ -125,4 +125,36 @@ postsRouter.post(
     }
   }
 )
+//GET /blogPosts/:id/comments, get all the comments for a specific post
+postsRouter.get("/:postId/comments", async (req, res, next) => {
+  try {
+    const posts = await getPosts()
+    const post = posts.findIndex((post) => post.id === req.params.postId)
+    if (post !== -1) {
+      res.send(posts[post].comments)
+    } else {
+      next(createError(404, "Post not found"))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+//POST /blogPosts/:id/comments, create a new comment for a specific post
+postsRouter.post("/:postId/comments", async (req, res, next) => {
+  try {
+    const posts = await getPosts()
+    const post = posts.findIndex((post) => post.id === req.params.postId)
+    if (post !== -1) {
+      const newComment = { ...req.body, id: uniqid(), createdAt: new Date() }
+      posts[post].comments.push(newComment)
+      await writePosts(posts)
+      res.send(newComment)
+    } else {
+      next(createError(404, "Post not found"))
+    }
+  } catch (error) {
+    next(error)
+  }
+})
+
 export default postsRouter

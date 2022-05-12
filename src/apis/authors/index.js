@@ -112,7 +112,7 @@ authorsRouter.post("/checkEmail", async (req, res) => {
   }
 })
 authorsRouter.post(
-  "/authors/:authorId/avatar",
+  "/:authorId/avatar",
   multer({
     fileFilter: (req, file, multerNext) => {
       if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {

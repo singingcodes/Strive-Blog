@@ -125,10 +125,23 @@ authorsRouter.post(
   }).single("cover"),
   async (req, res, next) => {
     try {
-      //   const postId = req.params.postId
-
-      await saveAuthorsAvatars(req.file.originalname, req.file.buffer)
-      res.send({ success: true })
+      const url = await saveAuthorsAvatars(
+        req.file.originalname,
+        req.file.buffer
+      )
+      const authors = await getAuthors()
+      const author = authors.findIndex(
+        (author) => author.id === req.params.authorId
+      )
+      if (author !== -1) {
+        const oldAuthor = authors[author]
+        const newAuthor = { ...oldAuthor, avatar: url, updatedAt: new Date() }
+        authors[author] = newAuthor
+        await writeAuthors(authors)
+        res.send(newAuthor)
+      } else {
+        next(createError(404, "Author not found"))
+      }
     } catch (error) {
       next(error)
     }

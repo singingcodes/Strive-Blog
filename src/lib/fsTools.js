@@ -18,7 +18,20 @@ export const getAuthors = () => readJSON(authorsJSONPath)
 export const writeAuthors = (authorsArray) =>
   writeJSON(authorsJSONPath, authorsArray)
 
-export const saveAuthorsAvatars = (fileName, contentAsBuffer) =>
-  writeFile(join(authorsPublicFolderPath, fileName), contentAsBuffer)
-export const savePostsCovers = (fileName, contentAsBuffer) =>
-  writeFile(join(postsPublicFolderPath, fileName), contentAsBuffer)
+export const saveAuthorsAvatars = (fileName, contentAsBuffer) => {
+  const filePath = join(authorsPublicFolderPath, fileName)
+  const savedPath = `/img/authors/${fileName}`
+  console.log(savedPath)
+  writeFile(filePath, contentAsBuffer)
+  const url = `http://localhost:3000${savedPath}`
+  return url
+}
+
+export const savePostsCovers = (fileName, contentAsBuffer) => {
+  const filePath = join(postsPublicFolderPath, fileName)
+  const savedPath = `/img/posts/${fileName}`
+  console.log(savedPath)
+  writeFile(filePath, contentAsBuffer)
+  const url = `http://localhost:3000${savedPath}`
+  return url
+}

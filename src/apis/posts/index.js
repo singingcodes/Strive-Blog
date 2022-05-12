@@ -108,10 +108,18 @@ postsRouter.post(
   }).single("cover"),
   async (req, res, next) => {
     try {
-      //   const postId = req.params.postId
-
-      await savePostsCovers(req.file.originalname, req.file.buffer)
-      res.send({ success: true })
+      const posts = await getPosts()
+      const post = posts.findIndex((post) => post.id === req.params.postId)
+      const url = await savePostsCovers(req.file.fieldname, req.file.buffer)
+      if (post !== -1) {
+        const oldPost = posts[post]
+        const newPost = { ...oldPost, cover: url, updatedAt: new Date() }
+        posts[post] = newPost
+        await writePosts(posts)
+        res.send(newPost)
+      } else {
+        next(createError(404, "Post not found"))
+      }
     } catch (error) {
       next(error)
     }

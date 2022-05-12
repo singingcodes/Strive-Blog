@@ -11,10 +11,10 @@ const postSchema = {
     isString: { errorMessage: "Title is required", min: 1 },
   },
 
-  cover: {
-    in: ["body"],
-    isString: { errorMessage: "Cover is required" },
-  },
+  // cover: {
+  //   in: ["body"],
+  //   isURL: { errorMessage: "Cover is required" },
+  // },
 
   "readTime.value": {
     in: ["body"],

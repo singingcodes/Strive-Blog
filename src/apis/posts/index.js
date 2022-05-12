@@ -1,22 +1,21 @@
 import express from "express"
-import fs from "fs"
-import { fileURLToPath } from "url"
-import { dirname, join } from "path"
 import uniqid from "uniqid"
+import multer from "multer"
 import createError from "http-errors"
 import { checkPostSchema, checkPostValidationResult } from "./postValidation.js"
+import { getPosts, writePosts, savePostsCovers } from "../../lib/fsTools.js"
 
 const postsRouter = express.Router()
 
-const postJsonPath = join(dirname(fileURLToPath(import.meta.url)), "posts.json")
-const getPosts = () => JSON.parse(fs.readFileSync(postJsonPath))
-const writePosts = (posts) =>
-  fs.writeFileSync(postJsonPath, JSON.stringify(posts))
+// const postJsonPath = join(dirname(fileURLToPath(import.meta.url)), "posts.json")
+// const getPosts = () => JSON.parse(fs.readFileSync(postJsonPath))
+// const writePosts = (posts) =>
+//   fs.writeFileSync(postJsonPath, JSON.stringify(posts))
 
 // GET /blogPosts
-postsRouter.get("/", (req, res, next) => {
+postsRouter.get("/", async (req, res, next) => {
   try {
-    const posts = getPosts()
+    const posts = await getPosts()
     if (req.query && req.query.title) {
       const filteredPosts = posts.filter((post) =>
         post.title.toLowerCase().includes(req.query.title.toLowerCase())
@@ -35,13 +34,12 @@ postsRouter.post(
   "/",
   checkPostSchema,
   checkPostValidationResult,
-  (req, res, next) => {
+  async (req, res, next) => {
     try {
-      console.log(req.body)
       const newPost = { ...req.body, id: uniqid(), createdAt: new Date() }
-      const posts = getPosts()
+      const posts = await getPosts()
       posts.push(newPost)
-      writePosts(posts)
+      await writePosts(posts)
       res.status(201).send(newPost)
     } catch (error) {
       next(error)
@@ -50,9 +48,9 @@ postsRouter.post(
 )
 
 // GET /blogPosts/:id
-postsRouter.get("/:postId", (req, res, next) => {
+postsRouter.get("/:postId", async (req, res, next) => {
   try {
-    const posts = getPosts()
+    const posts = await getPosts()
     const post = posts.find((post) => post.id === req.params.postId)
     if (post) {
       res.send(post)
@@ -65,15 +63,15 @@ postsRouter.get("/:postId", (req, res, next) => {
 })
 
 // PUT /blogPosts/:id
-postsRouter.put("/:postId", (req, res, next) => {
+postsRouter.put("/:postId", async (req, res, next) => {
   try {
-    const posts = getPosts()
+    const posts = await getPosts()
     const post = posts.findIndex((post) => post.id === req.params.postId)
     if (post === -1) {
       const oldPost = posts[post]
       const newPost = { ...oldPost, ...req.body, updatedAt: new Date() }
       posts[post] = newPost
-      writePosts(posts)
+      await writePosts(posts)
       res.send(newPost)
     } else {
       next(createError(404, "Post not found"))
@@ -84,14 +82,39 @@ postsRouter.put("/:postId", (req, res, next) => {
 })
 
 // DELETE /blogPosts/:id
-postsRouter.delete("/:postId", (req, res, next) => {
+postsRouter.delete("/:postId", async (req, res, next) => {
   try {
-    const posts = getPosts()
+    const posts = await getPosts()
     const postsLeft = posts.filter((post) => post.id !== req.params.postId)
-    writePosts(postsLeft)
+    await writePosts(postsLeft)
     res.status(204).send()
   } catch (error) {
     next(error)
   }
 })
+//POST /blogPosts/:id/uploadCover, uploads a picture (save as idOfTheBlogPost.jpg in the public/img/blogPosts folder) for the blog post specified by the id. Store the newly created URL into the corresponding post in blogPosts.json
+
+postsRouter.post(
+  "/posts/:postId/cover",
+  multer({
+    fileFilter: (req, file, multerNext) => {
+      if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
+        multerNext(createError(400, "Only png/jpeg allowed!"))
+      } else {
+        multerNext(null, true)
+      }
+    },
+    limits: { fileSize: 1024 * 1024 * 5 },
+  }).single("cover"),
+  async (req, res, next) => {
+    try {
+      //   const postId = req.params.postId
+
+      await savePostsCovers(req.file.originalname, req.file.buffer)
+      res.send({ success: true })
+    } catch (error) {
+      next(error)
+    }
+  }
+)
 export default postsRouter

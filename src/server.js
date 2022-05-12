@@ -1,6 +1,7 @@
 import express from "express"
 import authorsRouter from "./apis/authors/index.js"
 import postsRouter from "./apis/posts/index.js"
+import filesRouter from "./apis/files/index.js"
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
 import {
@@ -20,7 +21,7 @@ server.use(cors())
 // endpoints
 server.use("/authors", authorsRouter)
 server.use("/blogPosts", postsRouter)
-
+server.use("/files", filesRouter)
 // error handlers
 server.use(handleBadRequestError)
 server.use(handleNotFoundError)

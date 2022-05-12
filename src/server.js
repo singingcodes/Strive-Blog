@@ -1,7 +1,7 @@
 import express from "express"
 import authorsRouter from "./apis/authors/index.js"
 import postsRouter from "./apis/posts/index.js"
-// import filesRouter from "./apis/files/index.js"
+import { join } from "path"
 import listEndpoints from "express-list-endpoints"
 import cors from "cors"
 import {
@@ -13,6 +13,8 @@ import {
 
 const server = express()
 const port = 3001
+
+const publicFolderPath = join(process.cwd(), "./public")
 
 // middleWares
 server.use(express.json())

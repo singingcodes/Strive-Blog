@@ -1,5 +1,5 @@
 import express from "express"
-import uniqid from "uniqid"
+import { extname } from "path"
 import multer from "multer"
 import createError from "http-errors"
 import {
@@ -20,8 +20,16 @@ import {
   findPostByIdAndUpdate,
   saveNewPost,
 } from "../../lib/db/posts.js"
-import { saveNewComment } from "../../lib/db/comments.js"
-import { checkCommentSchema } from "./commentsValidation.js"
+import {
+  findCommentById,
+  findCommentByIdAndDelete,
+  findCommentByIdAndUpdate,
+  saveNewComment,
+} from "../../lib/db/comments.js"
+import {
+  checkCommentSchema,
+  checkCommentUpdateSchema,
+} from "./commentsValidation.js"
 
 const postsRouter = express.Router()
 
@@ -114,7 +122,7 @@ postsRouter.post(
       const fileName = req.params.postId + extname(req.file.originalname)
       await savePostsCovers(fileName, req.file.buffer)
       const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
-        cover: "/img/posts" + fileName,
+        cover: "/img/posts/" + fileName,
       })
       res.send(updatedPost)
     } catch (error) {
@@ -145,5 +153,47 @@ postsRouter.post(
     }
   }
 )
+
+postsRouter.get("/:postId/comments/:commentId", async (req, res, next) => {
+  try {
+    const comment = await findCommentById(
+      req.params.postId,
+      req.params.commentId
+    )
+    res.send(comment)
+  } catch (error) {
+    next(error)
+  }
+})
+
+postsRouter.put(
+  "/:postId/comments/:commentId",
+  checkCommentUpdateSchema,
+  checkPostValidationResult,
+  async (req, res, next) => {
+    try {
+      const updatedComment = await findCommentByIdAndUpdate(
+        req.params.postId,
+        req.params.commentId,
+        req.body
+      )
+      res.send(updatedComment)
+    } catch (error) {
+      next(error)
+    }
+  }
+)
+
+postsRouter.delete("/:postId/comments/:commentId", async (req, res, next) => {
+  try {
+    const review = await findCommentByIdAndDelete(
+      req.params.postId,
+      req.params.commentId
+    )
+    res.send(review)
+  } catch (error) {
+    next(error)
+  }
+})
 
 export default postsRouter

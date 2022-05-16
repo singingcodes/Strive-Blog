@@ -15,10 +15,12 @@ const server = express()
 const port = 3001
 
 const publicFolderPath = join(process.cwd(), "./public")
+console.log(publicFolderPath)
 
 // middleWares
 server.use(express.json())
 server.use(cors())
+server.use(express.static(publicFolderPath))
 
 // endpoints
 server.use("/authors", authorsRouter)

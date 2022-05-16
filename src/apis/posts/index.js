@@ -122,7 +122,7 @@ postsRouter.post(
       const fileName = req.params.postId + extname(req.file.originalname)
       await savePostsCovers(fileName, req.file.buffer)
       const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
-        cover: "/img/posts/" + fileName,
+        cover: "/public/img/posts/" + fileName,
       })
       res.send(updatedPost)
     } catch (error) {

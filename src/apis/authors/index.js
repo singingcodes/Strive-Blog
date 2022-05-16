@@ -9,12 +9,6 @@ import {
 } from "../../lib/fsTools.js"
 
 const authorsRouter = express.Router()
-// const currentFile = import.meta.url
-// console.log(currentFile)
-// const currentFilePath = fileURLToPath(currentFile)
-// const currentDirectory = dirname(currentFilePath)
-// console.log(currentDirectory)
-// const authorsJSONPath = join(currentDirectory, "authors.json")
 
 // POST /authors
 authorsRouter.post("/", async (req, res, next) => {

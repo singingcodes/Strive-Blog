@@ -1,7 +1,7 @@
 import fs from "fs-extra"
 import { fileURLToPath } from "url"
 import { dirname, join } from "path"
-const { readJSON, writeJSON, writeFile } = fs
+const { readJSON, writeJSON, writeFile, unlink } = fs
 
 const dataFolderPath = join(dirname(fileURLToPath(import.meta.url)), "../data")
 const postsJSONPath = join(dataFolderPath, "posts.json")
@@ -27,11 +27,16 @@ export const saveAuthorsAvatars = (fileName, contentAsBuffer) => {
   return url
 }
 
-export const savePostsCovers = (fileName, contentAsBuffer) => {
-  const filePath = join(postsPublicFolderPath, fileName)
-  const savedPath = `/img/posts/${fileName}`
-  console.log(savedPath)
-  writeFile(filePath, contentAsBuffer)
-  const url = `http://localhost:3000${savedPath}`
-  return url
-}
+// export const savePostsCovers = (fileName, contentAsBuffer) => {
+//   const filePath = join(postsPublicFolderPath, fileName)
+//   const savedPath = `/img/posts/${fileName}`
+//   console.log(savedPath)
+//   writeFile(filePath, contentAsBuffer)
+//   const url = `http://localhost:3000${savedPath}`
+//   return url
+// }
+export const savePostsCovers = (filename, contentAsBuffer) =>
+  writeFile(join(postsPublicFolderPath, filename), contentAsBuffer)
+
+export const deletePostsImages = (fileName) =>
+  unlink(postsPublicFolderPath, "../../", fileName)

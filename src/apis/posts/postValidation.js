@@ -11,11 +11,6 @@ const postSchema = {
     isString: { errorMessage: "Title is required", min: 1 },
   },
 
-  cover: {
-    in: ["body"],
-    isURL: { errorMessage: "Cover is required" },
-  },
-
   "readTime.value": {
     in: ["body"],
     isInt: { errorMessage: "Read time is required" },
@@ -35,16 +30,61 @@ const postSchema = {
     isString: { errorMessage: "Author's Avatar is required" },
   },
 
-  createdAt: {
-    in: ["body"],
-  },
   content: {
     in: ["body"],
     isString: { errorMessage: "Content is required", min: 1 },
   },
 }
 
+const postUpdateSchema = {
+  category: {
+    in: ["body"],
+    isString: { errorMessage: "Category is required", options: { min: 1 } },
+    optional: true,
+  },
+  title: {
+    in: ["body"],
+    isString: { errorMessage: "Title is required", min: 1 },
+    optional: true,
+  },
+
+  cover: {
+    in: ["body"],
+    isURL: { errorMessage: "Cover is required" },
+    optional: true,
+  },
+
+  "readTime.value": {
+    in: ["body"],
+    isInt: { errorMessage: "Read time is required" },
+    optional: true,
+  },
+
+  "readTime.unit": {
+    in: ["body"],
+    isString: { errorMessage: "Unit is required" },
+    optional: true,
+  },
+
+  "author.name": {
+    in: ["body"],
+    isString: { errorMessage: "Author's Name is required" },
+    optional: true,
+  },
+  "author.avatar": {
+    in: ["body"],
+    isString: { errorMessage: "Author's Avatar is required" },
+    optional: true,
+  },
+  content: {
+    in: ["body"],
+    isString: { errorMessage: "Content is required", min: 1 },
+    optional: true,
+  },
+}
+
 export const checkPostSchema = checkSchema(postSchema)
+export const checkPostUpdateSchema = checkSchema(postUpdateSchema)
 export const checkPostValidationResult = (req, res, next) => {
   const errors = validationResult(req)
   console.log(errors)

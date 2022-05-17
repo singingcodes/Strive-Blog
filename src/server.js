@@ -23,7 +23,6 @@ const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 const corsOptions = {
   origin: (origin, next) => {
     console.log("CURRENT ORIGIN: ", origin)
-
     if (!origin || whitelist.indexOf(origin) !== -1) {
       next(null, true)
     } else {

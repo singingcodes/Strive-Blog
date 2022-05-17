@@ -51,6 +51,7 @@ const cloudinaryUploader = multer({
   },
   limits: { fileSize: 1024 * 1024 * 5 },
 }).single("cover")
+
 // GET /blogPosts
 postsRouter.get("/", async (req, res, next) => {
   try {

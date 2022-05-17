@@ -7,6 +7,8 @@ import {
   checkPostUpdateSchema,
   checkPostValidationResult,
 } from "./postValidation.js"
+import { v2 as cloudinary } from "cloudinary"
+import { CloudinaryStorage } from "multer-storage-cloudinary"
 import {
   getPosts,
   writePosts,
@@ -33,6 +35,22 @@ import {
 
 const postsRouter = express.Router()
 
+const cloudinaryUploader = multer({
+  storage: new CloudinaryStorage({
+    cloudinary,
+    params: {
+      folder: "strive-blog/posts",
+    },
+  }),
+  fileFilter: (req, file, multerNext) => {
+    if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
+      multerNext(createError(400, "Only png/jpeg allowed!"))
+    } else {
+      multerNext(null, true)
+    }
+  },
+  limits: { fileSize: 1024 * 1024 * 5 },
+}).single("cover")
 // GET /blogPosts
 postsRouter.get("/", async (req, res, next) => {
   try {
@@ -107,24 +125,16 @@ postsRouter.delete("/:postId", async (req, res, next) => {
 
 postsRouter.post(
   "/:postId/cover",
-  multer({
-    fileFilter: (req, file, multerNext) => {
-      if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
-        multerNext(createError(400, "Only png/jpeg allowed!"))
-      } else {
-        multerNext(null, true)
-      }
-    },
-    limits: { fileSize: 1024 * 1024 * 5 },
-  }).single("cover"),
+  cloudinaryUploader,
   async (req, res, next) => {
     try {
-      const fileName = req.params.postId + extname(req.file.originalname)
-      await savePostsCovers(fileName, req.file.buffer)
-      const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
-        cover: "/public/img/posts/" + fileName,
-      })
-      res.send(updatedPost)
+      console.log("FILE: ", req.file)
+      // const fileName = req.params.postId + extname(req.file.originalname)
+      // await savePostsCovers(fileName, req.file.buffer)
+      // const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
+      //   cover: req.file.url,
+      // })
+      res.send()
     } catch (error) {
       next(error)
     }

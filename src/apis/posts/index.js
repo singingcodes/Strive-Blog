@@ -130,11 +130,7 @@ postsRouter.post(
   async (req, res, next) => {
     try {
       console.log("FILE: ", req.file)
-      // const fileName = req.params.postId + extname(req.file.originalname)
-      // await savePostsCovers(fileName, req.file.buffer)
-      // const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
-      //   cover: req.file.url,
-      // })
+
       res.send()
     } catch (error) {
       next(error)

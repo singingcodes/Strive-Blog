@@ -130,8 +130,12 @@ postsRouter.post(
   async (req, res, next) => {
     try {
       console.log("FILE: ", req.file)
-
-      res.send()
+      //update cover in the db
+      const post = await findPostById(req.params.postId)
+      const updatedPost = await findPostByIdAndUpdate(req.params.postId, {
+        cover: req.file.path,
+      })
+      res.send(updatedPost)
     } catch (error) {
       next(error)
     }

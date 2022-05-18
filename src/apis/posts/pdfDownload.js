@@ -7,7 +7,7 @@ import { findPostById } from "../../lib/db/posts.js"
 const filesRouter = express.Router()
 filesRouter.get("/:postId/pdf", async (req, res, next) => {
   try {
-    res.setHeader("Content-Disposition", "attachment; filename=example.pdf")
+    res.setHeader("Content-Disposition", "attachment; filename=blogPost.pdf")
     const post = await findPostById(req.params.postId)
     const source = getPDFReadableStream(post)
 

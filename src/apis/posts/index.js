@@ -1,5 +1,5 @@
 import express from "express"
-import { extname } from "path"
+
 import multer from "multer"
 import createError from "http-errors"
 import {
@@ -9,12 +9,8 @@ import {
 } from "./postValidation.js"
 import { v2 as cloudinary } from "cloudinary"
 import { CloudinaryStorage } from "multer-storage-cloudinary"
-import {
-  getPosts,
-  writePosts,
-  savePostsCovers,
-  deletePostsImages,
-} from "../../lib/fsTools.js"
+import { getPDFReadableStream } from "../../lib/pdf.js"
+import { deletePostsImages, getPosts } from "../../lib/fsTools.js"
 import {
   findPost,
   findPostById,

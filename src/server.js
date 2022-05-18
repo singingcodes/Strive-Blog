@@ -1,6 +1,7 @@
 import express from "express"
 import authorsRouter from "./apis/authors/index.js"
 import postsRouter from "./apis/posts/index.js"
+import filesRouter from "./apis/posts/pdfDownload.js"
 import { join } from "path"
 import listEndpoints from "express-list-endpoints"
 import createError from "http-errors"
@@ -43,6 +44,7 @@ server.use(express.static(publicFolderPath))
 // endpoints
 server.use("/authors", authorsRouter)
 server.use("/blogPosts", postsRouter)
+server.use("/files", filesRouter)
 // server.use("/files", filesRouter)
 // error handlers
 server.use(handleBadRequestError)

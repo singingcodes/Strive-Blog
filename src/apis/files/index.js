@@ -1,56 +1,42 @@
-// import express from "express"
-// import multer from "multer"
+import express from "express"
+import { getPDFReadableStream } from "../../lib/pdf.js"
+import { getBooksReadableStream } from "../../lib/fsTools.js"
+import json2csv from "json2csv"
 
-// import { saveAuthorsAvatars, savePostsCovers } from "../../lib/fsTools.js"
+import { pipeline } from "stream"
+import { findPostById } from "../../lib/db/posts.js"
 
-// const filesRouter = express.Router()
+const filesRouter = express.Router()
+filesRouter.get("/:postId/pdf", async (req, res, next) => {
+  try {
+    res.setHeader("Content-Disposition", "attachment; filename=blogPost.pdf")
+    const post = await findPostById(req.params.postId)
+    const source = await getPDFReadableStream(post)
 
-// // filesRouter.post(
-// //   "/authors/:authorId/avatar",
-// //   multer({
-// //     fileFilter: (req, file, multerNext) => {
-// //       if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
-// //         multerNext(createError(400, "Only png/jpeg allowed!"))
-// //       } else {
-// //         multerNext(null, true)
-// //       }
-// //     },
-// //     limits: { fileSize: 1024 * 1024 * 5 },
-// //   }).single("avatar"),
-// //   async (req, res, next) => {
-// //     try {
-// //       //   const postId = req.params.postId
+    const destination = res
 
-// //       await saveAuthorsAvatars(req.file.originalname, req.file.buffer)
-// //       res.send({ success: true })
-// //     } catch (error) {
-// //       next(error)
-// //     }
-// //   }
-// // )
+    pipeline(source, destination, (err) => {
+      if (err) console.log(err)
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+filesRouter.get("/authorCSV", (req, res, next) => {
+  try {
+    res.setHeader("Content-Disposition", "attachment; filename=author.csv")
 
-// filesRouter.post(
-//   "/posts/:postId/cover",
-//   multer({
-//     fileFilter: (req, file, multerNext) => {
-//       if (file.mimetype !== "image/jpeg" && file.mimetype !== "image/png") {
-//         multerNext(createError(400, "Only png/jpeg allowed!"))
-//       } else {
-//         multerNext(null, true)
-//       }
-//     },
-//     limits: { fileSize: 1024 * 1024 * 5 },
-//   }).single("cover"),
-//   async (req, res, next) => {
-//     try {
-//       //   const postId = req.params.postId
+    const source = getBooksReadableStream()
+    const destination = res
+    const transform = new json2csv.Transform({
+      fields: ["name", "email"],
+    })
 
-//       await savePostsCovers(req.file.originalname, req.file.buffer)
-//       res.send({ success: true })
-//     } catch (error) {
-//       next(error)
-//     }
-//   }
-// )
-
-// export default filesRouter
+    pipeline(source, transform, destination, (err) => {
+      if (err) console.log(err)
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+export default filesRouter

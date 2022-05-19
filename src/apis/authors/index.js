@@ -7,6 +7,7 @@ import {
   writeAuthors,
   saveAuthorsAvatars,
 } from "../../lib/fsTools.js"
+import { sendRegistrationEmail } from "../../lib/email-tools.js"
 
 const authorsRouter = express.Router()
 
@@ -17,11 +18,14 @@ authorsRouter.post("/", async (req, res, next) => {
     const authors = await getAuthors()
     authors.push(newAuthor)
     await writeAuthors(authors)
-    res.status(201).send(newAuthor)
+    const { email } = req.body
+    await sendRegistrationEmail(email)
+    res.status(201).send({ message: "Author created successfully" })
   } catch (error) {
     next(error)
   }
 })
+
 // GET /authors
 authorsRouter.get("/", async (req, res, next) => {
   try {
@@ -39,7 +43,7 @@ authorsRouter.get("/", async (req, res, next) => {
   }
 })
 // GET /authors/:id
-authorsRouter.get("/:id", async (req, res, next) => {
+authorsRouter.get("/:authorId", async (req, res, next) => {
   try {
     const authors = await getAuthors()
     const author = authors.find((author) => author.id === req.params.id)

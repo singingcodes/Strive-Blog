@@ -1,8 +1,8 @@
 import express from "express"
 import { getPDFReadableStream } from "../../lib/pdf.js"
-import { getBooksReadableStream } from "../../lib/fsTools.js"
+import { getBooksReadableStream, getPosts } from "../../lib/fsTools.js"
 import json2csv from "json2csv"
-
+import { generatePDFAsync } from "../../lib/pdf.js"
 import { pipeline } from "stream"
 import { findPostById } from "../../lib/db/posts.js"
 
@@ -35,6 +35,24 @@ filesRouter.get("/authorCSV", (req, res, next) => {
     pipeline(source, transform, destination, (err) => {
       if (err) console.log(err)
     })
+  } catch (error) {
+    next(error)
+  }
+})
+
+filesRouter.get("/asyncPDF", async (req, res, next) => {
+  try {
+    const posts = await getPosts()
+    // generate the pdf and save it on disk
+    const path = await generatePDFAsync(posts[0])
+
+    // attach it to email
+    // await attachToEmail()
+    // send the email
+    // await sendEmail()
+    // optionally delete the file
+    // await deleteFile()
+    res.send(path)
   } catch (error) {
     next(error)
   }

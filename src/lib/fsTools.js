@@ -41,3 +41,4 @@ export const savePostsCovers = (filename, contentAsBuffer) =>
 
 export const deletePostsImages = (fileName) =>
   unlink(postsPublicFolderPath, "../../", fileName)
+export const getPDFsPath = (filename) => join(dataFolderPath, "./pdf", filename)

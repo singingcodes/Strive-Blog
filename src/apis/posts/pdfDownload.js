@@ -9,7 +9,7 @@ filesRouter.get("/:postId/pdf", async (req, res, next) => {
   try {
     res.setHeader("Content-Disposition", "attachment; filename=blogPost.pdf")
     const post = await findPostById(req.params.postId)
-    const source = getPDFReadableStream(post)
+    const source = await getPDFReadableStream(post)
 
     const destination = res
 

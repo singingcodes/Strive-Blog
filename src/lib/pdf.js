@@ -1,42 +1,42 @@
 import PdfPrinter from "pdfmake"
+import striptags from "striptags"
+import axios from "axios"
 
-export const getPDFReadableStream = (post) => {
-  const fonts = {
-    Roboto: {
-      normal: "Helvetica",
-      bold: "Helvetica-Bold",
-    },
+const fonts = {
+  Roboto: {
+    normal: "Helvetica",
+    bold: "Helvetica-Bold",
+    italics: "Helvetica-Oblique",
+    bolditalics: "Helvetica-BoldOblique",
+  },
+}
+const printer = new PdfPrinter(fonts)
+export const getPDFReadableStream = async (post) => {
+  let imagePart = {}
+  if (post.cover) {
+    const response = await axios.get(post.cover, {
+      responseType: "arraybuffer",
+    })
+    console.log(response)
+    const blogCoverURLParts = post.cover.split("/")
+    const fileName = blogCoverURLParts[blogCoverURLParts.length - 1]
+    const [id, extension] = fileName.split(".")
+    const base64 = response.data.toString("base64")
+    const base64Image = `data:image/${extension};base64,${base64}`
+    imagePart = { image: base64Image, width: 500, margin: [0, 0, 0, 40] }
   }
-
-  const printer = new PdfPrinter(fonts)
 
   const docDefinition = {
     content: [
-      {
-        alignment: "justify",
-        text: "Title:" + post.title,
-        style: "header",
-      },
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Confectum ponit legam, perferendis nomine miserum, animi. Moveat nesciunt triari naturam.\n\n",
-      {
-        text: "category: " + post.category,
-        style: "subheader",
-      },
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Confectum ponit legam, perferendis nomine miserum, animi. Moveat nesciunt triari naturam.\n\n",
-      {
-        text: "posted by " + post.author.name,
-        style: "subheader",
-      },
-      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Confectum ponit legam, perferendis nomine miserum, animi. Moveat nesciunt triari naturam.\n\n",
-      {
-        text: post.content,
-        style: "content",
-      },
+      imagePart,
+      { text: post.title, style: "header" },
+      { text: striptags(post.content), lineHeight: 1.5 },
     ],
     styles: {
       header: {
         fontSize: 18,
         bold: true,
+        margin: [0, 0, 0, 20],
       },
       subheader: {
         fontSize: 15,

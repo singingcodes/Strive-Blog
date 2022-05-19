@@ -23,7 +23,7 @@ export const getPDFReadableStream = async (post) => {
     const [id, extension] = fileName.split(".")
     const base64 = response.data.toString("base64")
     const base64Image = `data:image/${extension};base64,${base64}`
-    imagePart = { image: base64Image, width: 500, margin: [0, 0, 0, 40] }
+    imagePart = { image: base64Image, width: 400, margin: [0, 0, 0, 40] }
   }
 
   const docDefinition = {
